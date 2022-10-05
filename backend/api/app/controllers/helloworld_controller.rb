@@ -1,6 +1,6 @@
 class HelloworldController < ApplicationController
     def index
-        users = "Hello World"
-        render status: 200, json: { users: users }
+        msg = "Hello World"
+        render status: 200, json: { msg: msg }
     end
 end

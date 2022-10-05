@@ -1,5 +1,5 @@
 {
-	"name": "NextJS Sample",
+	"name": "NextJS Dev",
 	// Dockerfileでイメージ・コンテナを作成
 	"dockerComposeFile": "../docker-compose.yml",
 	// VS Codeのワークスペースフォルダ

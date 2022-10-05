@@ -15,7 +15,7 @@ services:
       context: backend
     tty: true
     volumes:
-      - ./backend:/backend
+      - ./backend/api:/api
     ports:
       - 3001:3001
     environment:
