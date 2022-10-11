@@ -4,10 +4,15 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   # root "articles#index"
-  resources :helloworld, only: :index
+
   namespace :api do
     namespace :v1 do
       mount_devise_token_auth_for 'User', at: 'auth'
+
+      resources :helloworld, only: :index
+      resources :categories, only: [:index, :create]
+      resources :comments, only: [:index, :create]
+      
     end
   end
 end

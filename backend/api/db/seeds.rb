@@ -5,3 +5,13 @@
 #
 #   movies = Movie.create([{ name: "Star Wars" }, { name: "Lord of the Rings" }])
 #   Character.create(name: "Luke", movie: movies.first)
+5.times do
+    name = Faker::Construction.subcontract_category
+    Category.create!(name: name)
+  end
+  
+10.times do
+category_id = rand(2..5)
+body = Faker::Food.dish
+Comment.create!(category_id: category_id, body: body)
+end
