@@ -3,16 +3,21 @@ module Api
     class CategoriesController < ApplicationController
       def index
           categories = Category.all.order(:id)
-          render json: categories, each_serializer: CategorySerializer, include: [:comments]
+          render json: categories, each_serializer: CategorySerializer
       end
 
       def create
         category = Category.new(category_params)
-        if catgory.save
+        if category.save
           render json: { status: 'SUCCESS', data: category }
         else
           render json: { status: 'ERROR', data: category.errors }
         end
+      end
+
+      def show
+        category = Category.where(id: params[:id])
+        render json: category, each_serializer: CategoryWithCommentsSerializer, include: [:comments]
       end
     
       private

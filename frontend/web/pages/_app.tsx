@@ -42,13 +42,13 @@ function MyApp({ Component, pageProps, router }: AppPropsWithLayout) {
       fetch(url)
       .then(res => res.json())
       .then(data => {
-        const categories = data.map( (x: { id: string; name: string; created_at: string}) => new Category(x.name, "/"));
+        const categories = data.map( (x: { id: string; name: string; created_at: string}) => new Category( x.name, "/category/"+x.id ));
         setSidebarContent(categories);
        });
     }
     fetchSidebarData();
 
-  },[router.pathname])
+  },[])
 
   const getLayout = Component.getLayout ?? ((page) => <Layout>{page}</Layout>);
   return (
