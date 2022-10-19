@@ -1,6 +1,8 @@
 module Api
   module V1
     class CategoriesController < ApplicationController
+      before_action :authenticate_api_v1_user!, except: [:index,:show]
+
       def index
           categories = Category.all.order(:id)
           render json: categories, each_serializer: CategorySerializer

@@ -1,8 +1,10 @@
 module Api
   module V1
     class CommentsController < ApplicationController
+        before_action :authenticate_api_v1_user!, except: [:index,:create, :show_or_hide]
+        
         def index
-            comments = Comment.all
+            comments = Comment.where(is_shown: true)
             render json: comments, each_serializer: CommentSerializer, include: [:categories]
           end
         

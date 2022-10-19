@@ -1,65 +1,107 @@
-import Cookies from "js-cookie"
+import urljoin from "url-join";
+import { getAuthCookies, removeAuthCookies, setAuthCookies } from "./cookie";
 
-import { SignInParams } from "../interfaces"
+/**
+ * サインインした結果
+ */
+ type SigninResult = {
+    success: boolean,
+    data: string
+}
 
-// サインイン（ログイン）
-export const signIn = async (params: SignInParams)  => {
-    const url = process.env.NEXT_PUBLIC_API_HOST + "/api/v1/auth/sign_in";
-    const formData = new FormData();
-    formData.append("email", params.email)
-    formData.append("password", params.password)
+/**
+ * サインアウトした結果
+ */
+ type SignoutResult = {
+    success: boolean
+}
 
-    try {
-        const response = await fetch(url, {
-            method: 'POST',
-            body: formData
-        });
-        return await response.json();
-    } catch (error) {
-        console.log(error);
-    }
+/**
+ * サインインする
+ * @param formData 認証データ
+ * @returns 実行結果
+ */
+export const signin = async (formData: FormData)  => {
+
+    const url = urljoin(process.env.NEXT_PUBLIC_API_BASEURL || "", "auth/sign_in");
+
+    const res = await fetch(url, {
+      method: 'POST',
+      body: formData,
+      mode: "cors"
+    }).then(async (response) => {
+      if (response.ok) {
+        setAuthCookies(response.headers.get("uid") || "",
+                        response.headers.get("client") || "",
+                        response.headers.get("access-token") || "");
+
+        return {"success": true, "data": await response.json()}
+
+      } else {
+        removeAuthCookies();
+        return {"success": false, "data": await response.json()}
+      }
+    }).catch((error) => {
+      console.log(error);
+      removeAuthCookies()
+      throw new Error(error);
+    });
+
+    return res;
 };
 
-export const signOut = ()  => {
-    // const url = process.env.NEXT_PUBLIC_API_HOST + "/api/v1/auth/sign_out";
-    const url = "http://localhost/api/v1/auth/sign_out";
-    const formData = new FormData();
-    formData.append("access-token", Cookies.get("access_token") || "");
-    formData.append("client", Cookies.get("client") || "");
-    formData.append("uid", Cookies.get("uid") || "");
 
-    fetch(url, {
-        method : 'DELETE',
+/**
+ * サインアウトする
+ * @returns 実行結果
+ */
+export const signout = async() => {
+
+    const url = urljoin(process.env.NEXT_PUBLIC_API_BASEURL || "", "auth/sign_out");
+    const cookies = getAuthCookies();
+
+    const formData = new FormData();
+    for (const cookie in cookies) {
+        formData.append(cookie, cookies[cookie]);
+    }
+
+    const res:SignoutResult = await fetch(url, {
+        method: 'DELETE',
+        headers: cookies,
         body: formData
     }).then((response) => {
         return response.json();
-    }).then((res) => {
-        if (res.success) {
-            Cookies.remove("uid");
-            Cookies.remove("client");
-            Cookies.remove("access-token");
-        }
     }).catch((error) => {
-        console.log(error);
+        throw new Error(error);
     })
+
+    return res;
 };
 
-// 認証済みのユーザーを取得
-export const getCurrentUser = async () => {
-    const url = process.env.NEXT_PUBLIC_API_HOST + "/api/v1/auth/sessions";
 
-    if (!Cookies.get("access-token") || !Cookies.get("client") || !Cookies.get("uid")) return
-    try {
-        const response = await fetch(url, {
-            method: 'GET',
-            headers: {
-                "access-token": Cookies.get("access-token") || "",
-                "client": Cookies.get("client") || "",
-                "uid": Cookies.get("uid") || ""
-            }
-        });
-        return await response.json();
-    } catch (error) {
-        console.log(error);
+/**
+ * 認証済みのユーザーを取得する
+ * @returns 認証済みのユーザー
+ */
+export const getCurrentUser = async () => {
+    
+    const url = urljoin(process.env.NEXT_PUBLIC_API_BASEURL || "", "auth/sessions");
+    const cookies = getAuthCookies();
+
+    for (const cookie in cookies) {
+        if (!cookies[cookie]) {
+            return;
+        }
     }
+
+    const response = await fetch(url, {
+        method: 'GET',
+        headers: cookies
+    }).then((res) => {
+        return res.json();
+    }).catch((error) => {
+        throw new Error(error);
+    });
+
+    return response;
 }

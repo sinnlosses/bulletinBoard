@@ -1,49 +1,31 @@
-import Cookies from 'js-cookie';
 import { useRouter } from 'next/router';
 import React, { useContext, useState } from 'react'
+import { signin } from '../lib/auth';
 import { AuthContext } from './_app';
 
 const login = () => {
   const router = useRouter();
   const [errorMessage, setErrorMessage] = useState<string>("");
-  const { isSignedIn, setIsSignedIn, currentUser, setCurrentUser} = useContext(AuthContext);
+  const { setIsSignedIn, setCurrentUser} = useContext(AuthContext);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const url = process.env.NEXT_PUBLIC_API_HOST + "/api/v1/auth/sign_in";
-    const formData = new FormData(event.currentTarget);
-
     setErrorMessage("");
 
-    fetch(url, {
-      method: 'POST',
-      body: formData,
-      mode: "cors"
-    }).then((response) => {
-      if (response.ok) {
-        Cookies.set("uid", response.headers.get("uid") || "");
-        Cookies.set("client", response.headers.get("client") || "");
-        Cookies.set("access-token", response.headers.get("access-token") || "");
+    const formData = new FormData(event.currentTarget);
+    const result = signin(formData);
+    result.then((res) => {
+      if (res.success) {
         setIsSignedIn(true);
+        setCurrentUser(res.data);
+        router.push("/");
       } else {
-        Cookies.remove("uid");
-        Cookies.remove("client");
-        Cookies.remove("access-token");
+        console.log(res.data);
         setErrorMessage("認証に失敗しました");
       }
-
-      return response.json();
-    }).then((response) => {
-        if (isSignedIn) {
-          setCurrentUser(response.data);
-          router.push("/");
-        }
     }).catch((error) => {
       console.log(error);
-      Cookies.remove("uid");
-      Cookies.remove("client");
-      Cookies.remove("access-token");
       setErrorMessage("認証に失敗しました");
     });
 
