@@ -1,7 +1,7 @@
 import React, { useContext, useEffect } from "react";
 import Link from "next/link";
-import { Home } from "./SidebarData";
-import { SidebarContext } from "../../pages/_app";
+import { Admin, Home } from "./SidebarData";
+import { AuthContext, SidebarContext } from "../../pages/_app";
 import { useWindowSize } from "react-use";
 
 /**
@@ -44,6 +44,7 @@ export const SidebarClassName = {
 
 export default function Sidebar() {
   const { sidebarStatus, setSidebarStatus, sidebarContent, setSidebarContent } = useContext(SidebarContext);
+  const { isSignedIn, setIsSignedIn} = useContext(AuthContext);
 
   const { height, width } = useWindowSize();
   useEffect(() => {
@@ -64,6 +65,15 @@ export default function Sidebar() {
               title={Home.title}
               link={Home.link}
             />
+
+            {/* 管理ページ */}
+            {isSignedIn &&
+              <ListItem
+                key={Admin.title}
+                title={Admin.title}
+                link={Admin.link}
+              />
+            }
 
             {/* カテゴリ */}
             {sidebarContent.map((pvalue, key) => (

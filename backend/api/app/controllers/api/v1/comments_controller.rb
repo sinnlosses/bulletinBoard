@@ -14,11 +14,19 @@ module Api
             render json: { status: 'ERROR', data: comment.errors }
           end
         end
+
+        def show_or_hide
+          is_shown = comment_params[:is_shown]
+          comment = Comment.find(params[:id])
+          comment.update!(is_shown: is_shown)
+
+          render json: {status: 'SUCCESS', data: "更新完了"}
+        end
       
         private
       
         def comment_params
-          params.require(:comment).permit(:name, :mailaddress, :subject, :body, :category_id)
+          params.permit(:name, :mailaddress, :subject, :body, :category_id, :poster_id, :is_shown)
         end
     end
   end

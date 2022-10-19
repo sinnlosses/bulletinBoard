@@ -1,11 +1,13 @@
 import "../styles/globals.css";
 import { NextPage } from "next";
 import type { AppProps } from "next/app";
-import React, { ReactElement, ReactNode, useEffect, useState } from "react";
+import React, { createContext, ReactElement, ReactNode, useEffect, useState } from "react";
 import Layout from "../components/Layouts/Layouts";
 import { Category, SidebarClassName } from "../components/Sidebar/Sidebar";
+import { getCurrentUser } from "../lib/auth";
+import { User } from "../interfaces";
 
-type NextPageWithLayout = NextPage & {
+export type NextPageWithLayout = NextPage & {
   getLayout?: (page: ReactElement) => ReactNode;
 };
 
@@ -23,6 +25,16 @@ type TSidebarContext = {
   setSidebarContent: React.Dispatch<React.SetStateAction<Array<Category>>>
 };
 
+// 管理者権限に関するグローバル変数
+export const AuthContext = createContext({} as {
+  loading: boolean
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>
+  isSignedIn: boolean
+  setIsSignedIn: React.Dispatch<React.SetStateAction<boolean>>
+  currentUser: User | undefined
+  setCurrentUser: React.Dispatch<React.SetStateAction<User | undefined>>
+})
+
 // サイドバーの表示、非表示を扱うコンテキスト
 export const SidebarContext = React.createContext({} as TSidebarContext);
 
@@ -32,6 +44,30 @@ function MyApp({ Component, pageProps, router }: AppPropsWithLayout) {
   const [sidebarStatus, setSidebarStatus] = useState(SidebarClassName.toggleOff);
   // サイドバーの内容の管理
   const [sidebarContent, setSidebarContent] = useState<Category[]>([]);
+  // 管理者権限の管理
+  const [loading, setLoading] = useState<boolean>(true);
+  const [isSignedIn, setIsSignedIn] = useState<boolean>(false);
+  const [currentUser, setCurrentUser] = useState<User | undefined>()
+
+  // 認証済みのユーザーがいるかどうかチェック
+  // 確認できた場合はそのユーザーの情報を取得
+  const handleGetCurrentUser = async () => {
+    try {
+      const res = await getCurrentUser()
+
+      if (res?.is_login === true) {
+        setIsSignedIn(true)
+        setCurrentUser(res?.data)
+
+      } else {
+        console.log("No current user")
+      }
+    } catch (err) {
+      console.log(err)
+    }
+
+    setLoading(false)
+  }
 
   // サイドバーの内容を取得して反映
   useEffect(() => {
@@ -50,11 +86,18 @@ function MyApp({ Component, pageProps, router }: AppPropsWithLayout) {
 
   },[])
 
+  useEffect(() => {
+    handleGetCurrentUser()
+  }, [setCurrentUser])
+
   const getLayout = Component.getLayout ?? ((page) => <Layout>{page}</Layout>);
   return (
-    <SidebarContext.Provider value={{ sidebarStatus, setSidebarStatus, sidebarContent, setSidebarContent }}>
-      {getLayout(<Component {...pageProps} />)}
-    </SidebarContext.Provider>
+    <AuthContext.Provider value={{ loading, setLoading, isSignedIn, setIsSignedIn, currentUser, setCurrentUser}}>
+      <SidebarContext.Provider value={{ sidebarStatus, setSidebarStatus, sidebarContent, setSidebarContent }}>
+        {getLayout(<Component {...pageProps} />)}
+      </SidebarContext.Provider>
+    </AuthContext.Provider>
+
   );
 }
 
