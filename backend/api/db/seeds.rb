@@ -6,14 +6,14 @@
 #   movies = Movie.create([{ name: "Star Wars" }, { name: "Lord of the Rings" }])
 #   Character.create(name: "Luke", movie: movies.first)
 
-User.find_or_create_by!(
+User.create!(
    email: 'test@example.com',
-   encrypted_password: '$2a$12$o2bQ.6dDQ.F34qKoU1kyluuGReSbDiQzp.bAZu47q3zLG7DqzSLmu'
+   password: 'password'
 )
 
-Category.find_or_create_by!(
+Category.create!(
    name: '旅行'
 )
-Category.find_or_create_by!(
+Category.create!(
    name: '食べ物'
 )
