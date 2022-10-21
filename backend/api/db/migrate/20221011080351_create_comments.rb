@@ -7,8 +7,7 @@ class CreateComments < ActiveRecord::Migration[7.0]
       t.string :subject
       t.string :body, :null => false
       t.boolean :is_shown, :default => true, :null => false
-      t.bigint :category_id
-
+      t.string :poster_id,
       t.timestamps
     end
 

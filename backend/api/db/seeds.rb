@@ -5,13 +5,15 @@
 #
 #   movies = Movie.create([{ name: "Star Wars" }, { name: "Lord of the Rings" }])
 #   Character.create(name: "Luke", movie: movies.first)
-5.times do
-    name = Faker::Construction.subcontract_category
-    Category.create!(name: name)
-  end
-  
-10.times do
-category_id = rand(2..5)
-body = Faker::Food.dish
-Comment.create!(category_id: category_id, body: body)
-end
+
+User.find_or_create_by!(
+   email: 'test@example.com',
+   encrypted_password: '$2a$12$o2bQ.6dDQ.F34qKoU1kyluuGReSbDiQzp.bAZu47q3zLG7DqzSLmu'
+)
+
+Category.find_or_create_by!(
+   name: '旅行'
+)
+Category.find_or_create_by!(
+   name: '食べ物'
+)
