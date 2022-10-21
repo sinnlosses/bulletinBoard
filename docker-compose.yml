@@ -9,6 +9,8 @@ services:
       - ./frontend:/frontend
     ports:
       - 3000:3000
+    working_dir: /frontend/web/
+    command: /bin/bash -c "npm upgrade && npm start"
 
   backend:
     build:
@@ -18,6 +20,8 @@ services:
       - ./backend/api:/api
     ports:
       - 3001:3001
+    working_dir: /api/
+    command: /bin/bash -c "bundle install && rm -f tmp/pids/server.pid && bundle exec rails s -p 3001 -b '0.0.0.0'"
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
