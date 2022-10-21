@@ -10,7 +10,7 @@ services:
     ports:
       - 3000:3000
     working_dir: /frontend/web/
-    command: /bin/bash -c "npm upgrade && npm start"
+    command: /bin/bash -c "npm upgrade && npm run dev"
 
   backend:
     build:
