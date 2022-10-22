@@ -12,6 +12,10 @@ docker-compose up -d
 docker-compose run backend sh docker-db-init.sh
 ```
 
+サンプルとして、管理者のメールアドレスとパスワードを以下に掲載します。
+email: test@example.com
+password: password
+
 # サンプル画面
 
 # bulletinBoard<img width="1440" alt="スクリーンショット 2022-10-20 1 02 59" src="https://user-images.githubusercontent.com/23355453/196744525-a44da829-f7e1-4e72-a284-4da21c58e05e.png">
