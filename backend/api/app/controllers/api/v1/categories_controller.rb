@@ -18,8 +18,12 @@ module Api
       end
 
       def show
-        category = Category.where(id: params[:id])
-        render json: category, each_serializer: CategoryWithCommentsSerializer, include: [:comments]
+        category = Category.where(id: params[:id]) 
+        if api_v1_user_signed_in?
+          render json: category, each_serializer: CategoryWithAllCommentsSerializer, include: [:comments]
+        else
+          render json: category, each_serializer: CategoryWithShownCommentsSerializer, include: [:comments]
+        end
       end
 
       def statistics

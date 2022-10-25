@@ -57,8 +57,12 @@ export const fetchCategoryWithComments = async(categoryId:string) => {
     }
 
     const url = urljoin(process.env.NEXT_PUBLIC_API_BASEURL || "", "categories", categoryId);
-
-    const res = await fetch(url)
+    const cookies = getAuthCookies();
+    
+    const res = await fetch(url, {
+        method: "GET",
+        headers: cookies
+    })
         .then(res => res.json())
         .then(data => {
             const comments: CommentContent[] = data[0].comments.map(
