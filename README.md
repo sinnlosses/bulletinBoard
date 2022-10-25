@@ -13,6 +13,7 @@ docker-compose run backend sh docker-db-init.sh
 ```
 
 サンプルとして、管理者のメールアドレスとパスワードを以下に掲載します。
+
 email: test@example.com
 password: password
 
